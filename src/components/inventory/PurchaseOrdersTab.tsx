@@ -720,6 +720,24 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
   return (
     <div className="space-y-4">
       {/* 2-Option Split Tabs: Items / Medicines PO vs Materials PO */}
+      {lockType === 'material' ? (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200/70 flex items-center gap-1.5 shadow-2xs">
+              <span>📦</span> Dental Material Orders ({orders.filter(po => getPurchaseOrderType(po) === 'MATERIAL').length})
+            </span>
+          </div>
+          <div className="w-full sm:w-auto">
+            <Button
+              onClick={() => openCreateDrawer('MATERIAL')}
+              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 shadow-sm text-white font-medium text-xs h-9 sm:h-8 px-4 flex items-center justify-center rounded-xl"
+              title="Create a new dental material purchase order"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> Create Material PO
+            </Button>
+          </div>
+        </div>
+      ) : (
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-xs">
         <div className="grid grid-cols-3 sm:flex sm:items-center gap-1 sm:gap-1.5 w-full sm:w-auto p-1 bg-slate-100/90 rounded-xl border border-slate-200/70">
           <button
@@ -777,10 +795,11 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
             className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 shadow-sm text-white font-medium text-xs h-9 sm:h-8 px-3.5 flex items-center justify-center"
             title="Create a new purchase order"
           >
-            <Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> {lockType === 'material' ? 'Create Material PO' : 'Create Purchase Order'}
+            <Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> Create Purchase Order
           </Button>
         </div>
       </div>
+      )}
 
       <DataTableToolbar
         searchQuery={search}
@@ -839,11 +858,11 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
           emptyState={
             <DataTableEmpty
               icon={ShoppingCart}
-              title="No purchase orders found"
-              description="Create a purchase order to request stock from approved suppliers."
+              title={lockType === 'material' ? "No dental material purchase orders found" : "No purchase orders found"}
+              description={lockType === 'material' ? "Create a material purchase order to request consumables and supplies from approved vendors." : "Create a purchase order to request stock from approved suppliers."}
               action={
-                <Button onClick={() => openCreateDrawer()} size="sm" className="mt-2">
-                  <Plus className="w-4 h-4 mr-1.5" /> Create Purchase Order
+                <Button onClick={() => openCreateDrawer(lockType === 'material' ? 'MATERIAL' : undefined)} size="sm" className={lockType === 'material' ? "mt-2 bg-amber-600 hover:bg-amber-700" : "mt-2"}>
+                  <Plus className="w-4 h-4 mr-1.5" /> {lockType === 'material' ? 'Create Material PO' : 'Create Purchase Order'}
                 </Button>
               }
             />
@@ -1049,6 +1068,20 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
                   {/* Create / Edit Form */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* PO Type Toggle */}
+                    {lockType === 'material' ? (
+                      <div className="col-span-1 sm:col-span-2 p-3 bg-amber-50/70 rounded-xl border border-amber-200/60 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">📦</span>
+                          <div>
+                            <span className="text-xs font-bold text-amber-900 block">Dental Material Purchase Order</span>
+                            <span className="text-[11px] text-amber-700">Consumables, impression materials, composite resins, and lab supplies</span>
+                          </div>
+                        </div>
+                        <Badge className="bg-amber-100 text-amber-800 border-amber-300 font-bold text-[10px] px-2 py-0.5">
+                          Material Locked
+                        </Badge>
+                      </div>
+                    ) : (
                     <div className="col-span-1 sm:col-span-2 space-y-1.5">
                       <Label className="text-xs font-semibold text-slate-600 uppercase">
                         Purchase Order Type <span className="text-rose-500">*</span>
@@ -1080,6 +1113,7 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
                         </button>
                       </div>
                     </div>
+                    )}
 
                     <div className="space-y-1.5">
                       <Label className="text-xs font-semibold text-slate-600 uppercase">
