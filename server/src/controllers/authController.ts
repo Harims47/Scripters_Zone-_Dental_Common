@@ -37,7 +37,8 @@ export const login = async (req: Request, res: Response) => {
     );
 
     // Set HTTP-only cookie
-    res.cookie('token', token, {
+    res.clearCookie('token');
+    res.cookie('dental_common_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
@@ -60,6 +61,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = (req: Request, res: Response) => {
+  res.clearCookie('dental_common_token');
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

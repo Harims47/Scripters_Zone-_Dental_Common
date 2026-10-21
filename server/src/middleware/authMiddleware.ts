@@ -18,7 +18,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
   try {
     const bearerHeader = req.headers.authorization;
     const bearerToken = bearerHeader && bearerHeader.startsWith('Bearer ') ? bearerHeader.slice(7) : null;
-    const token = req.cookies?.token || bearerToken;
+    const token = req.cookies?.dental_common_token || req.cookies?.token || bearerToken;
 
     if (!token) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -33,7 +33,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     });
 
     if (!user) {
-      res.clearCookie('token');
+      res.clearCookie('dental_common_token'); res.clearCookie('token');
       return res.status(401).json({ error: 'User is inactive or deleted' });
     }
 
@@ -48,7 +48,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    res.clearCookie('token');
+    res.clearCookie('dental_common_token'); res.clearCookie('token');
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 };
