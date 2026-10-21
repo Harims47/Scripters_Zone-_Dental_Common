@@ -1546,6 +1546,7 @@ export function DoctorWorkspacePage() {
 
             {/* Core Action Buttons: Side-by-side on mobile, right-aligned on tablet/desktop */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              {activeFeatures.externalAdvice && (
               <Button
                 size="lg"
                 variant="outline"
@@ -1561,7 +1562,9 @@ export function DoctorWorkspacePage() {
                   </span>
                 )}
               </Button>
+              )}
 
+              {activeFeatures.transferPatient && (
               <Button
                 size="lg"
                 variant="outline"
@@ -1570,6 +1573,7 @@ export function DoctorWorkspacePage() {
               >
                 Transfer Patient
               </Button>
+              )}
               <Button
                 size="lg"
                 className="flex-1 sm:flex-initial sm:w-auto h-11 px-3 sm:px-6 text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"

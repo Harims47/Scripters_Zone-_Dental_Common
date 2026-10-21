@@ -226,7 +226,7 @@ export function TreatmentPlanUI({
 
   useEffect(() => {
     if (initialView) {
-      setWorkspaceView(initialView);
+      setWorkspaceView(initialView === 'imaging' && !activeFeatures.opgRvg ? 'planning' : initialView);
     }
   }, [initialView]);
 
@@ -587,6 +587,7 @@ export function TreatmentPlanUI({
               </span>
             )}
           </button>
+          {activeFeatures.opgRvg && (
           <button
             type="button"
             onClick={() => setWorkspaceView('imaging')}
@@ -604,6 +605,7 @@ export function TreatmentPlanUI({
               </span>
             )}
           </button>
+          )}
         </div>
       </div>
 
@@ -622,6 +624,7 @@ export function TreatmentPlanUI({
         />
       </div>
 
+{activeFeatures.opgRvg && (
       <div className={workspaceView === 'imaging' ? 'bg-slate-50/50 p-1 sm:p-2 rounded-2xl w-full min-w-0 max-w-full overflow-hidden' : 'hidden'}>
         <DentalImagingSection
           patientId={patientId}
@@ -633,6 +636,7 @@ export function TreatmentPlanUI({
           onRegisterCommit={(fn) => { imagingCommitRef.current = fn; }}
         />
       </div>
+      )}
 
       <div className={workspaceView === 'planning' ? 'space-y-3 w-full min-w-0' : 'hidden'}>
         {/* Active Multi-Sitting Treatment In Progress Banner */}
