@@ -1,0 +1,33 @@
+import { z } from 'zod';
+
+export const createConsultationSchema = z.object({
+  body: z.object({
+    visitId: z.string().min(1, 'Invalid visit ID'),
+    reasonForVisit: z.string().min(1, 'Reason for visit is required'),
+    clinicalNotes: z.string().optional().default(''),
+    consultationFee: z.number().min(0, 'Fee cannot be negative').optional(),
+    treatmentFee: z.number().min(0, 'Treatment fee cannot be negative').optional(),
+    consultationWaiverReason: z.string().nullable().optional(),
+    treatmentWaiverReason: z.string().nullable().optional(),
+    auditAmount: z.number().nullable().optional()
+  })
+});
+
+export const updateConsultationSchema = z.object({
+  body: z.object({
+    reasonForVisit: z.string().min(1).optional(),
+    clinicalNotes: z.string().optional(),
+    consultationFee: z.number().min(0).optional(),
+    treatmentFee: z.number().min(0, 'Treatment fee cannot be negative').optional(),
+    consultationWaiverReason: z.string().nullable().optional(),
+    treatmentWaiverReason: z.string().nullable().optional(),
+    auditAmount: z.number().nullable().optional()
+  })
+});
+
+export const completeConsultationSchema = z.object({
+  body: z.object({
+    paymentOwner: z.enum(['RECEPTION', 'DOCTOR']).optional().default('RECEPTION'),
+    auditAmount: z.number().nullable().optional()
+  })
+});

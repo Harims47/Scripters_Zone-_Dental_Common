@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: dentalcore_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-dental}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-dentalpassword}
+      POSTGRES_DB: ${DATABASE_NAME:-dentalcore}
+    ports:
+      - "${DATABASE_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

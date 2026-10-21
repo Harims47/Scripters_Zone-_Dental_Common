@@ -1,0 +1,253 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+
+// Authoritative server entry point
+dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), 'server/.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+import { validateDatabaseConfig, probeDatabaseConnectivity, dbConfig } from './db';
+import { validateJwtSecret } from './config/authConfig';
+
+// Fail-closed validation at startup
+try {
+  validateDatabaseConfig();
+  validateJwtSecret();
+} catch (err: any) {
+  console.error('[STARTUP HALTED]', err.message);
+  process.exit(1);
+}
+
+import cookieParser from 'cookie-parser';
+import authRoutes from './routes/authRoutes';
+import patientRoutes from './routes/patientRoutes';
+import appointmentRoutes from './routes/appointmentRoutes';
+import visitRoutes from './routes/visitRoutes';
+import queueRoutes from './routes/queueRoutes';
+import consultationRoutes from './routes/consultationRoutes';
+import prescriptionRoutes from './routes/prescriptionRoutes';
+import inventoryRoutes from './routes/inventoryRoutes';
+import dispensingRoutes from './routes/dispensingRoutes';
+import billingRoutes from './routes/billingRoutes';
+import paymentRoutes from './routes/paymentRoutes';
+import patientHistoryRoutes from './routes/patientHistoryRoutes';
+import reportsRoutes from './routes/reportsRoutes';
+import staffRoutes from './routes/staffRoutes';
+import documentRoutes from './routes/documentRoutes';
+import treatmentRoutes from './routes/treatmentRoutes';
+import dentalImageRoutes from './routes/dentalImageRoutes';
+import supplierRoutes from './routes/supplierRoutes';
+import purchaseOrderRoutes from './routes/purchaseOrderRoutes';
+import supplierBillRoutes from './routes/supplierBillRoutes';
+import medicineCategoryRoutes from './routes/medicineCategoryRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
+import notificationRoutes from './routes/notificationRoutes';
+import webhookRoutes from './routes/webhookRoutes';
+import historicalMigrationRoutes from './routes/historicalMigrationRoutes';
+import reimbursementRoutes from './routes/reimbursementRoutes';
+import settingsRoutes from './routes/settingsRoutes';
+import externalAdviceRoutes from './routes/externalAdviceRoutes';
+import { QueueRunner } from './services/communication/queueRunner';
+import { HistoricalBatchService } from './services/historicalMigration/HistoricalBatchService';
+
+const app = express();
+const port = Number(process.env.PORT) || 3000;
+
+// Trust reverse proxy (e.g. Render) for accurate client IP in express-rate-limit and secure cookies
+app.set('trust proxy', 1);
+
+// Middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(cookieParser());
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || '')
+  .split(',')
+  .map((o) => o.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+    const cleanOrigin = origin.replace(/\/$/, '');
+    if (
+      cleanOrigin.startsWith('http://localhost:') ||
+      cleanOrigin.startsWith('http://127.0.0.1:') ||
+      allowedOrigins.length === 0 ||
+      allowedOrigins.includes(cleanOrigin) ||
+      allowedOrigins.includes('*')
+    ) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+}));
+
+// Static uploads serving for dental images & patient photos
+import { getUploadsRootDir } from './services/fileStorageService';
+app.use('/uploads', express.static(getUploadsRootDir(), {
+  maxAge: '7d',
+  immutable: true
+}));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/patients', patientHistoryRoutes); // Mounts /:patientId/history
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/visits', visitRoutes);
+app.use('/api/queue', queueRoutes);
+app.use('/api/consultations', consultationRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/purchase-orders', purchaseOrderRoutes);
+app.use('/api/supplier-bills', supplierBillRoutes);
+app.use('/api/medicine-categories', medicineCategoryRoutes);
+app.use('/api/dispensings', dispensingRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/treatments', treatmentRoutes);
+app.use('/api/patients', treatmentRoutes);
+app.use('/api/patients', dentalImageRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/webhooks/communication', webhookRoutes);
+app.use('/api/historical-migration', historicalMigrationRoutes);
+app.use('/api/reimbursements', reimbursementRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/external-advice', externalAdviceRoutes);
+
+// Health & Database Diagnostics Endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    const diag = await probeDatabaseConnectivity();
+    res.json({
+      status: 'ok',
+      message: 'DentalCore backend is running',
+      database: {
+        activeDb: diag.activeDb,
+        activeUser: diag.activeUser,
+        host: `${dbConfig.host}:${dbConfig.port}`,
+        tableCount: diag.tableCount,
+        source: dbConfig.source || 'env',
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: 'error',
+      message: 'DentalCore backend running, but database probe failed',
+      error: err.message,
+    });
+  }
+});
+
+// 404 handler for unmatched API routes
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
+
+// Serve compiled frontend in production
+const candidateDistPaths = [
+  path.resolve(process.cwd(), 'dist'),
+  path.resolve(process.cwd(), '../dist'),
+  path.resolve(__dirname, '../../../../dist'),
+  path.resolve(__dirname, '../../../dist'),
+  path.resolve(__dirname, '../../dist'),
+];
+const clientDistPath = candidateDistPaths.find((p) => fs.existsSync(path.join(p, 'index.html')));
+
+if (clientDistPath) {
+  console.log(`[Production] Serving static frontend from: ${clientDistPath}`);
+  app.use(express.static(clientDistPath));
+
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
+import { errorHandler } from './middleware/errorHandler';
+
+// Error Handler
+app.use(errorHandler);
+
+import { prisma } from './db';
+import { runOneTimeMigrationHook } from './services/migration/oneTimeMigrationHook';
+import { runFirstAdminBootstrap } from './services/bootstrap/firstAdminBootstrap';
+
+// Server boot with one-time migration hook and first admin bootstrap execution gates
+async function boot() {
+  if (process.env.MIGRATION_EXECUTE_ONCE === 'true' && process.env.INIT_HEAD_DOCTOR_ONCE === 'true') {
+    console.error('[Startup HALTED] MIGRATION_EXECUTE_ONCE and INIT_HEAD_DOCTOR_ONCE cannot be enabled in the same startup.');
+    throw new Error('MIGRATION_EXECUTE_ONCE and INIT_HEAD_DOCTOR_ONCE are mutually exclusive.');
+  }
+
+  if (process.env.MIGRATION_EXECUTE_ONCE === 'true') {
+    await runOneTimeMigrationHook();
+  }
+
+  if (process.env.INIT_HEAD_DOCTOR_ONCE === 'true') {
+    await runFirstAdminBootstrap();
+  }
+
+  const server = app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running on port ${port}`);
+    QueueRunner.start().catch((err) => {
+      console.error('Failed to start communication QueueRunner:', err.message);
+    });
+    HistoricalBatchService.recoverStaleMigrationJobs().catch((err) => {
+      console.error('Failed to recover stale historical migration jobs:', err.message);
+    });
+
+    // Ensure master catalogs (19 categories, 17 medicines, 33 treatments) are synced if database is unseeded
+    import('./services/catalogSyncService').then(({ syncMasterCatalogs }) => {
+      prisma.medicine.count().then(async (count) => {
+        if (count === 0) {
+          console.log('[AutoSync] Medicine catalog is empty (0 records). Auto-populating master catalogs...');
+          await syncMasterCatalogs();
+        }
+      }).catch((err) => {
+        console.warn('[AutoSync] Notice: could not check catalog count:', err.message);
+      });
+    }).catch(() => {});
+  });
+
+  // Graceful Shutdown Mechanism
+  const shutdown = async (signal: string) => {
+    console.log(`\nReceived ${signal}. Shutting down gracefully...`);
+    QueueRunner.stop();
+    server.close(async () => {
+      console.log('HTTP server closed.');
+      await prisma.$disconnect();
+      console.log('Database connection closed.');
+      process.exit(0);
+    });
+
+    // Force close after 10 seconds if graceful shutdown fails
+    setTimeout(() => {
+      console.error('Could not close connections in time, forcefully shutting down');
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+}
+
+boot().catch((err) => {
+  console.error('[STARTUP HALTED] Server boot failed:', err.message || 'Fatal error');
+  process.exit(1);
+});
+
+export default app;

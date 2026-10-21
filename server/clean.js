@@ -1,0 +1,51 @@
+const { PrismaClient } = require('@prisma/client');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Strict safety check: Never run against production or without explicit authorization
+const dbUrl = process.env.DATABASE_URL || '';
+if (process.env.NODE_ENV === 'production' || !process.env.ALLOW_DATA_RESET || dbUrl.includes('render.com') || dbUrl.includes('godaddy') || dbUrl.includes('supabase')) {
+  console.error('[SAFETY SHIELD] Refusing to run clean.js: ALLOW_DATA_RESET=true is required and cannot run in production.');
+  process.exit(1);
+}
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('Cleaning operational/transactional data...');
+  
+  // 1. Operational transactions & dispensing
+  await prisma.payment.deleteMany({});
+  await prisma.queueEntry.deleteMany({});
+  await prisma.dispensingItem.deleteMany({});
+  await prisma.dispensing.deleteMany({});
+  await prisma.prescriptionItem.deleteMany({});
+  await prisma.prescription.deleteMany({});
+  await prisma.consultation.deleteMany({});
+  await prisma.treatmentPlanItem.deleteMany({});
+  await prisma.treatmentPlan.deleteMany({});
+  await prisma.visit.deleteMany({});
+  await prisma.appointment.deleteMany({});
+  await prisma.patient.deleteMany({});
+
+  // 2. Inventory movements & purchase orders
+  await prisma.stockMovement.deleteMany({});
+  await prisma.purchaseOrderItem.deleteMany({});
+  await prisma.purchaseOrder.deleteMany({});
+
+  // 3. Reset medicine currentStock to 0 so the user can enter real stock
+  await prisma.medicine.updateMany({
+    data: { currentStock: 0 }
+  });
+
+  // 4. Reset staff attendance
+  await prisma.staff.updateMany({
+    data: { attendance: 'Present' }
+  });
+
+  console.log('Database cleaned successfully! All operational records, visits, patients, payments, movements, and POs wiped.');
+}
+
+main()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());
