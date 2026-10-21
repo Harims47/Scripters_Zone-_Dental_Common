@@ -28,6 +28,7 @@ import { WhatsAppActionButton } from '../components/communication/WhatsAppAction
 import { useClinicContext } from '../context/ClinicContext'
 import { api, API_BASE_URL } from '../lib/api'
 import { cn } from '../lib/utils'
+import { activeFeatures } from '../config/features'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
@@ -2465,81 +2466,83 @@ export function DoctorWorkspacePage() {
                   </div>
 
                   {/* Audit Amount Field (Specialized for Doctor Workspace) */}
-                  <div className="pt-2.5 mt-2 border-t border-slate-200/90 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="auditAmountInput" className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-                        <span>Audit Amount (₹)</span>
-                        <span className="text-[10px] font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Optional</span>
-                      </Label>
-                      {auditAmount && parseFloat(auditAmount) > 0 && (
-                        <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                          Receipt Scale: ₹{parseFloat(auditAmount).toLocaleString('en-IN')}
-                        </span>
-                      )}
+                  {activeFeatures.auditReceiptIsolation && (
+                    <div className="pt-2.5 mt-2 border-t border-slate-200/90 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="auditAmountInput" className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                          <span>Audit Amount (₹)</span>
+                          <span className="text-[10px] font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Optional</span>
+                        </Label>
+                        {auditAmount && parseFloat(auditAmount) > 0 && (
+                          <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                            Receipt Scale: ₹{parseFloat(auditAmount).toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <Input
+                          id="auditAmountInput"
+                          type="number"
+                          min="1"
+                          step="1"
+                          placeholder="e.g. 20000 (enter to generate audit receipt)"
+                          value={auditAmount}
+                          onChange={(e) => handleAuditAmountChange(e.target.value)}
+                          className="h-9 text-sm bg-white border-slate-300 focus:border-indigo-500 pr-8"
+                        />
+                        {auditAmount && (
+                          <button
+                            type="button"
+                            onClick={() => handleAuditAmountChange('')}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-1 cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[10.5px] text-slate-500 leading-tight">
+                        When provided, the downloadable receipt PDF considers only ₹{auditAmount || '...'} as the amount without altering clinic records or reception desk process visit billing.
+                      </p>
                     </div>
-                    <div className="relative">
-                      <Input
-                        id="auditAmountInput"
-                        type="number"
-                        min="1"
-                        step="1"
-                        placeholder="e.g. 20000 (enter to generate audit receipt)"
-                        value={auditAmount}
-                        onChange={(e) => handleAuditAmountChange(e.target.value)}
-                        className="h-9 text-sm bg-white border-slate-300 focus:border-indigo-500 pr-8"
-                      />
-                      {auditAmount && (
-                        <button
-                          type="button"
-                          onClick={() => handleAuditAmountChange('')}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-1 cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-[10.5px] text-slate-500 leading-tight">
-                      When provided, the downloadable receipt PDF considers only ₹{auditAmount || '...'} as the amount without altering clinic records or reception desk process visit billing.
-                    </p>
+                  )}
 
-                    {/* Downloadable PDF Documents */}
-                    <div className="pt-1 flex flex-col gap-1.5">
-                      {auditAmount && parseFloat(auditAmount) > 0 ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadReceipt(parseFloat(auditAmount))}
-                          disabled={isDownloadingReceipt}
-                          className="w-full h-9 bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-                        >
-                          <Download className="w-4 h-4 text-emerald-600" />
-                          {isDownloadingReceipt ? 'Generating Receipt...' : `Download Audit Receipt (₹${parseFloat(auditAmount).toLocaleString('en-IN')})`}
-                        </Button>
-                      ) : (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadReceipt()}
-                          disabled={isDownloadingReceipt}
-                          className="w-full h-9 bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-                        >
-                          <Receipt className="w-4 h-4 text-emerald-600" />
-                          {isDownloadingReceipt ? 'Generating Receipt...' : 'Download Payment Receipt'}
-                        </Button>
-                      )}
+                  {/* Downloadable PDF Documents */}
+                  <div className="pt-2.5 mt-2 border-t border-slate-200/90 flex flex-col gap-1.5">
+                    {activeFeatures.auditReceiptIsolation && auditAmount && parseFloat(auditAmount) > 0 ? (
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={handleDownloadInvoice}
-                        className="w-full h-8 bg-blue-50/70 hover:bg-blue-100/80 border-blue-200 text-blue-700 font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                        onClick={() => handleDownloadReceipt(parseFloat(auditAmount))}
+                        disabled={isDownloadingReceipt}
+                        className="w-full h-9 bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                       >
-                        <FileText className="w-3.5 h-3.5 text-blue-600" />
-                        Download Tax Invoice
+                        <Download className="w-4 h-4 text-emerald-600" />
+                        {isDownloadingReceipt ? 'Generating Receipt...' : 'Download Audit Receipt (₹' + parseFloat(auditAmount).toLocaleString('en-IN') + ')'}
                       </Button>
-                    </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadReceipt()}
+                        disabled={isDownloadingReceipt}
+                        className="w-full h-9 bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                      >
+                        <Receipt className="w-4 h-4 text-emerald-600" />
+                        {isDownloadingReceipt ? 'Generating Receipt...' : 'Download Payment Receipt'}
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadInvoice}
+                      className="w-full h-8 bg-blue-50/70 hover:bg-blue-100/80 border-blue-200 text-blue-700 font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-blue-600" />
+                      Download Tax Invoice
+                    </Button>
                   </div>
                 </div>
               )}

@@ -9,6 +9,7 @@ import { cn } from "../../lib/utils"
 import { t } from "../../lib/i18n"
 import { useAuth } from "../../context/AuthContext"
 import { canAccessRoute } from "../../lib/route-permissions"
+import { activeFeatures, activeBranding } from "../../config/features"
 
 export type ClinicRole = 'head-doctor' | 'duty-doctor' | 'receptionist'
 
@@ -67,7 +68,28 @@ export function Sidebar({ className, onNavigate, isCollapsed = false, onToggleCo
   }, [])
   
   // Filter navItems based on the current user's role and the centralized permission map
-  const filteredNav = navItems.filter(item => {
+  const currentNavItems = [...navItems];
+  if (activeFeatures.separateMaterialPo) {
+    const invIdx = currentNavItems.findIndex(i => i.href === '/inventory');
+    if (invIdx !== -1) {
+      currentNavItems.splice(invIdx + 1, 0, {
+        title: "Material PO",
+        href: "/inventory?tab=orders&type=material",
+        icon: Package
+      });
+    }
+  }
+
+  const filteredNav = currentNavItems.filter(item => {
+    if (!currentUser) return false;
+
+    // Feature Flags: Hide disabled modules
+    if (item.href === '/reimbursement' && !activeFeatures.reimbursement) {
+      return false;
+    }
+    if (item.href === '/historical-migration' && !activeFeatures.historicalMigration) {
+      return false;
+    }
     if (!currentUser) return false
     
     // Phase 9: Hide modules that are merged into Reception Desk
@@ -94,8 +116,8 @@ export function Sidebar({ className, onNavigate, isCollapsed = false, onToggleCo
       <div className={cn("h-[72px] flex items-center border-b border-slate-100 shrink-0 relative", isCollapsed ? "justify-center px-3" : "pl-4 pr-3 justify-between gap-2")}>
         <div className={cn("flex items-center min-w-0", isCollapsed ? "justify-center w-full" : "flex-1 overflow-hidden")}>
           <img
-            src={isCollapsed ? "/dental-icon.png" : "/dental-logo-trimmed.png"}
-            alt="Rafi Dental Clinic"
+            src={isCollapsed ? activeBranding.iconUrl : activeBranding.logoUrl}
+            alt={activeBranding.name}
             className={cn(
               "object-contain transition-all duration-200",
               isCollapsed ? "h-11 w-11 shrink-0" : "h-[56px] w-auto max-w-[195px] object-left"

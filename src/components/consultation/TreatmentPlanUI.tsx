@@ -32,6 +32,7 @@ import { FdiToothChart } from './FdiToothChart';
 import { getToothInfo } from '../../lib/toothMetadata';
 import { DentalImagingSection } from './DentalImagingSection';
 import { TreatmentSessionsSection } from './TreatmentSessionsSection';
+import { activeFeatures } from '../../config/features';
 
 function getSessionDueInfo(rawDate?: string | null): {
   badgeText: string;
@@ -220,7 +221,7 @@ export function TreatmentPlanUI({
   const [customSittingsInput, setCustomSittingsInput] = useState<string>('');
 
   // Workspace View Switcher (Treatment Planning vs Dental Imaging vs Treatment Sessions)
-  const [workspaceView, setWorkspaceView] = useState<'planning' | 'imaging' | 'sessions'>(initialView || 'planning');
+  const [workspaceView, setWorkspaceView] = useState<'planning' | 'imaging' | 'sessions'>((initialView === 'imaging' && !activeFeatures.opgRvg) ? 'planning' : (initialView || 'planning'));
   const [dentalImages, setDentalImages] = useState<DentalImage[]>([]);
 
   useEffect(() => {
@@ -771,7 +772,7 @@ export function TreatmentPlanUI({
                 </div>
 
                 {/* Subtle indicator if this tooth has an RVG radiograph */}
-                {dentalImages.some(img => img.type === 'RVG' && img.toothNumber === primaryToothInfo.fdi) && (
+                {activeFeatures.opgRvg && dentalImages.some(img => img.type === 'RVG' && img.toothNumber === primaryToothInfo.fdi) && (
                   <div className="flex items-center gap-1.5 text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-lg border border-teal-200 mt-1">
                     <Camera className="w-3 h-3 shrink-0" />
                     <span>Tooth {primaryToothInfo.fdi} has RVG radiograph</span>
