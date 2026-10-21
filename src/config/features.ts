@@ -1,4 +1,4 @@
-﻿export type ProductTier = '50k' | '1l' | 'custom';
+export type ProductTier = 'standard' | 'premium' | 'custom' | '50k' | '1l';
 
 export interface FeatureFlags {
   /** Digital Radiography & Imaging (OPG / RVG viewer, annotations) */
@@ -11,7 +11,7 @@ export interface FeatureFlags {
   externalAdvice: boolean;
   /** In-house Pharmacy inventory and medicine dispensing */
   pharmacy: boolean;
-  /** Separate Material / Lab Purchase Order menu & distinct report (e.g. Client Y customization) */
+  /** Separate Material / Lab Purchase Order menu & distinct report (e.g. Client customization) */
   separateMaterialPo: boolean;
   /** Receipt Audit field isolation (strictly disabled by default) */
   auditReceiptIsolation: boolean;
@@ -30,10 +30,12 @@ export interface ClinicBranding {
 }
 
 // -----------------------------------------------------------------------------
-// Baseline Defaults by Commercial Tier
+// Baseline Defaults by Commercial Edition:
+// - Standard Edition (50K): Essential clinic workflow (Reception, Queue, Doctor, Billing)
+// - Premium Edition (1L): Comprehensive suite (OPG/RVG, Reimbursement, Doctor Transfers, etc.)
 // -----------------------------------------------------------------------------
-const TIER_DEFAULTS: Record<ProductTier, FeatureFlags> = {
-  '50k': {
+const TIER_DEFAULTS: Record<string, FeatureFlags> = {
+  'standard': {
     opgRvg: false,
     reimbursement: false,
     transferPatient: false,
@@ -43,7 +45,7 @@ const TIER_DEFAULTS: Record<ProductTier, FeatureFlags> = {
     auditReceiptIsolation: false,
     historicalMigration: false,
   },
-  '1l': {
+  'premium': {
     opgRvg: true,
     reimbursement: true,
     transferPatient: true,
@@ -65,6 +67,13 @@ const TIER_DEFAULTS: Record<ProductTier, FeatureFlags> = {
   }
 };
 
+// Aliases for seamless backward compatibility
+TIER_DEFAULTS['50k'] = TIER_DEFAULTS['standard'];
+TIER_DEFAULTS['basic'] = TIER_DEFAULTS['standard'];
+TIER_DEFAULTS['1l'] = TIER_DEFAULTS['premium'];
+TIER_DEFAULTS['professional'] = TIER_DEFAULTS['premium'];
+TIER_DEFAULTS['pro'] = TIER_DEFAULTS['premium'];
+
 /**
  * Parses a boolean from environment variable with fallback.
  */
@@ -80,8 +89,8 @@ function parseBoolEnv(value: string | undefined, fallback: boolean): boolean {
  * Resolves active feature flags based on VITE_APP_TIER + granular environment overrides.
  */
 export function getFeatureFlags(): FeatureFlags {
-  const envTier = (import.meta.env.VITE_APP_TIER || '1l').toLowerCase() as ProductTier;
-  const base = TIER_DEFAULTS[envTier] || TIER_DEFAULTS['1l'];
+  const envTier = (import.meta.env.VITE_APP_TIER || 'standard').toLowerCase();
+  const base = TIER_DEFAULTS[envTier] || TIER_DEFAULTS['standard'];
 
   return {
     opgRvg: parseBoolEnv(import.meta.env.VITE_FEATURE_OPG_RVG, base.opgRvg),
