@@ -8,6 +8,7 @@ import { Dashboard } from './pages/Dashboard';
 import { QueuePage } from './pages/QueuePage';
 import { ReceptionDeskPage } from './pages/ReceptionDeskPage';
 import { InventoryPage } from './pages/InventoryPage';
+import { MaterialPOPage } from './pages/MaterialPOPage';
 import { BillingPage } from './pages/BillingPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { DoctorWorkspacePage } from './pages/DoctorWorkspacePage';
@@ -67,7 +68,7 @@ function App() {
             <Route path="partial-payments" element={<PartialPaymentAlertsPage />} />
             <Route path="queue" element={<QueuePage />} />
             <Route path="inventory" element={<InventoryPage />} />
-              <Route path="material-po" element={<InventoryPage defaultTab="orders" defaultType="material" />} />
+              <Route path="material-po" element={<MaterialPOPage />} />
             <Route path="billing" element={<BillingPage />} />
             <Route path="reimbursement" element={<ReimbursementPage />} />
             <Route path="staff" element={<StaffPage />} />

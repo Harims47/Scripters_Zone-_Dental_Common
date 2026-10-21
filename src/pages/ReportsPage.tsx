@@ -9,6 +9,8 @@ import { DoctorsReport } from '../components/reports/DoctorsReport'
 import { MedicinesReport } from '../components/reports/MedicinesReport'
 import { InventoryReport } from '../components/reports/InventoryReport'
 import { ProcurementReport } from '../components/reports/ProcurementReport'
+import { activeFeatures } from '../config/features'
+import { Boxes } from 'lucide-react'
 import {
   LayoutDashboard,
   Calendar,
@@ -31,6 +33,7 @@ export type ReportTab =
   | 'medicines'
   | 'inventory'
   | 'procurement'
+  | 'material-po'
 
 const TABS: { id: ReportTab; label: string; icon: React.ElementType }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -41,7 +44,8 @@ const TABS: { id: ReportTab; label: string; icon: React.ElementType }[] = [
   { id: 'doctors', label: 'Doctors', icon: Stethoscope },
   { id: 'medicines', label: 'Medicines', icon: Pill },
   { id: 'inventory', label: 'Inventory', icon: Package },
-  { id: 'procurement', label: 'Procurement', icon: ShoppingBag }
+  { id: 'procurement', label: 'Procurement', icon: ShoppingBag },
+  ...(activeFeatures.separateMaterialPo ? [{ id: 'material-po' as const, label: 'Material PO', icon: Boxes }] : [])
 ]
 
 export function ReportsPage() {
@@ -108,6 +112,7 @@ export function ReportsPage() {
         {activeTab === 'medicines' && <MedicinesReport dateRange={dateRange} />}
         {activeTab === 'inventory' && <InventoryReport dateRange={dateRange} />}
         {activeTab === 'procurement' && <ProcurementReport dateRange={dateRange} />}
+          {activeTab === 'material-po' && <ProcurementReport dateRange={dateRange} defaultType="material" />}
       </div>
     </div>
   )

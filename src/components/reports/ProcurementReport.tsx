@@ -14,9 +14,10 @@ import type { DateRangeState } from './ReportDateRange'
 
 interface ProcurementReportProps {
   dateRange: DateRangeState
+  defaultType?: 'all' | 'material'
 }
 
-export function ProcurementReport({ dateRange }: ProcurementReportProps) {
+export function ProcurementReport({ dateRange, defaultType }: ProcurementReportProps) { 
   const [data, setData] = useState<ProcurementReportResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -361,8 +362,8 @@ export function ProcurementReport({ dateRange }: ProcurementReportProps) {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.04)] overflow-hidden">
         <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900">Procurement & Financial Records</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Filter records by supplier, fulfillment status, and export full reports.</p>
+            <h3 className="text-base font-bold text-slate-900">{defaultType === 'material' ? 'Dental Material Procurement & PO Records' : 'Procurement & Financial Records'}</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{defaultType === 'material' ? 'Dental consumable, material, and lab order procurement records and export.' : 'Filter records by supplier, fulfillment status, and export full reports.'}</p>
           </div>
           <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl w-fit">
             <button

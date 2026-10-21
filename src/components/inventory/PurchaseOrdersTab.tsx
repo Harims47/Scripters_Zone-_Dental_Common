@@ -777,7 +777,7 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
             className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 shadow-sm text-white font-medium text-xs h-9 sm:h-8 px-3.5 flex items-center justify-center"
             title="Create a new purchase order"
           >
-            <Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> Create Purchase Order
+            <Plus className="w-3.5 h-3.5 mr-1.5 shrink-0" /> {lockType === 'material' ? 'Create Material PO' : 'Create Purchase Order'}
           </Button>
         </div>
       </div>
