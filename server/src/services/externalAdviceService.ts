@@ -151,7 +151,7 @@ ${advice.clinicalQuery}
 
       <div class="action-note">
         <p><strong>Please Reply with Your Clinical Opinion:</strong></p>
-        <p>Kindly reply directly to this email (<a href="mailto:${branding.email || 'clinic@rafidental.com'}">${branding.email || 'clinic@rafidental.com'}</a>) or contact Dr. ${treatingDoctorName} at <strong>${branding.phone || 'our clinic'}</strong> with your advice, required precautions, or medication adjustments.</p>
+        <p>Kindly reply directly to this email (<a href="mailto:${branding.email || 'care@standarddental.in'}">${branding.email || 'care@standarddental.in'}</a>) or contact Dr. ${treatingDoctorName} at <strong>${branding.phone || 'our clinic'}</strong> with your advice, required precautions, or medication adjustments.</p>
       </div>
 
       <div style="margin-top: 30px; padding-top: 16px; border-top: 1px dashed #cbd5e1; font-size: 13px;">
@@ -212,7 +212,7 @@ ${advice.clinicalQuery}
 
     const branding = getClinicBranding();
 
-    let treatingDoctorName = 'Dr. N MOHAMED RAFI B D S';
+    let treatingDoctorName = 'Dr. Arun';
     if (advice.doctorId) {
       const staffDoc = await prisma.staff.findUnique({ where: { id: advice.doctorId } });
       if (staffDoc) {

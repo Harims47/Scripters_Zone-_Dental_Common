@@ -16,17 +16,16 @@ export interface ClinicBranding {
  */
 export const resolveLogoPath = (): string | null => {
   const candidatePaths = [
-    path.join(process.cwd(), 'src/assets/dental-logo-trimmed.png'),
-    path.join(process.cwd(), 'src/assets/dental-logo.png'),
-    path.join(process.cwd(), '../public/dental-logo-trimmed.png'),
-    path.join(process.cwd(), '../public/dental-logo.png'),
-    path.join(process.cwd(), 'public/dental-logo-trimmed.png'),
-    path.join(__dirname, '../../assets/dental-logo-trimmed.png'),
-    path.join(__dirname, '../../assets/dental-logo.png'),
-    path.join(__dirname, '../../../src/assets/dental-logo-trimmed.png'),
-    path.join(__dirname, '../../../src/assets/dental-logo.png'),
-    path.join(__dirname, '../../../public/dental-logo-trimmed.png'),
-    path.join(__dirname, '../../../public/dental-logo.png')
+    path.resolve(__dirname, '../../../../public/standard_dental_clinic_logo.png'),
+    path.resolve(__dirname, '../../../../../public/standard_dental_clinic_logo.png'),
+    path.resolve(process.cwd(), '../public/standard_dental_clinic_logo.png'),
+    path.resolve(process.cwd(), 'public/standard_dental_clinic_logo.png'),
+    path.resolve(__dirname, '../../../../public/standard_dental_clinic_icon.png'),
+    path.resolve(__dirname, '../../../../../public/standard_dental_clinic_icon.png'),
+    path.resolve(__dirname, '../../assets/dental-logo.png'),
+    path.resolve(__dirname, '../../../src/assets/dental-logo.png'),
+    path.resolve(process.cwd(), 'src/assets/dental-logo.png'),
+    path.resolve(process.cwd(), 'src/assets/dental-logo-trimmed.png')
   ];
   for (const p of candidatePaths) {
     if (fs.existsSync(p)) {

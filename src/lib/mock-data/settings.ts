@@ -9,12 +9,12 @@ export interface ClinicProfile {
 }
 
 export const DEMO_CLINIC_PROFILE: ClinicProfile = {
-  name: "Rafi Dental Clinic",
-  phone: "094430 23648",
-  email: "clinic@rafidental.com",
-  address: "37, Dr.Venkatraman St, Gopichettipalayam",
-  city: "Gobichettipalayam",
-  pin: "638452",
+  name: "Standard Dental Clinic",
+  phone: "+91 98765 43210",
+  email: "care@standarddental.in",
+  address: "12 Medical Center Road",
+  city: "Chennai",
+  pin: "600001",
   language: "English"
 }
 

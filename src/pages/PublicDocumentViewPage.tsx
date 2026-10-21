@@ -64,8 +64,8 @@ export function PublicDocumentViewPage() {
           </p>
           <div className="p-4 bg-slate-50 rounded-xl text-xs text-slate-500 space-y-1 text-left">
             <p className="font-semibold text-slate-700">{activeBranding.name}</p>
-            <p>📞 094430 23648</p>
-            <p>📍 37, Dr.Venkatraman St, Gobichettipalayam</p>
+            <p>📞 {activeBranding.phone}</p>
+            <p>📍 {activeBranding.address}</p>
           </div>
         </div>
       </div>
@@ -138,10 +138,10 @@ export function PublicDocumentViewPage() {
         {/* Footer Contact */}
         <footer className="mt-4 text-center text-xs text-slate-500 space-y-1">
           <p className="flex items-center justify-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-slate-400" /> 37, Dr.Venkatraman St, Gobichettipalayam, Tamil Nadu 638452
+            <MapPin className="w-3.5 h-3.5 text-slate-400" /> {activeBranding.address}
           </p>
           <p className="flex items-center justify-center gap-1.5">
-            <Phone className="w-3.5 h-3.5 text-slate-400" /> Appointments & Queries: 094430 23648
+            <Phone className="w-3.5 h-3.5 text-slate-400" /> Appointments & Queries: {activeBranding.phone}
           </p>
         </footer>
       </main>

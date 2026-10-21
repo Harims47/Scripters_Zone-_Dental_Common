@@ -14,6 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/api';
 import { cn } from '../../lib/utils';
 import { openWhatsAppChat } from '../../lib/shareHelper';
+import { activeBranding } from '../../config/features';
 
 function WhatsAppIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -123,7 +124,7 @@ export function WhatsAppActionButton(props: WhatsAppActionButtonProps) {
     if (!isDocumentType || !entityId) {
       const appointmentDate = variables?.date || 'your scheduled date';
       const appointmentTime = variables?.time || '';
-      const apptMsg = `*Rafi Dental Clinic*\n\nDear *${recipientName}*,\nThis is to confirm your dental appointment with Dr. Rafi.\n\nDate: ${appointmentDate}\nTime: ${appointmentTime}\n\n37, Dr.Venkatraman St, Gobichettipalayam\nPh: 094430 23648`;
+      const apptMsg = `*${activeBranding.name}*\n\nDear *${recipientName}*,\nThis is to confirm your dental appointment with Dr. Arun.\n\nDate: ${appointmentDate}\nTime: ${appointmentTime}\n\n${activeBranding.address}\nPh: ${activeBranding.phone}`;
       setShareData({ message: apptMsg });
       setLoadError(null);
       return;
@@ -162,7 +163,7 @@ export function WhatsAppActionButton(props: WhatsAppActionButtonProps) {
   };
 
   const handleOpenWhatsApp = () => {
-    const textToSend = shareData?.message || `Hello ${recipientName}, this is regarding your visit at Rafi Dental Clinic.`;
+    const textToSend = shareData?.message || `Hello ${recipientName}, this is regarding your visit at ${activeBranding.name}.`;
     openWhatsAppChat(recipientPhone, textToSend);
     toast.success('Opening WhatsApp...');
     setModalOpen(false);

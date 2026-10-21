@@ -179,7 +179,7 @@ export const generatePrescriptionPDF = async (data: PrescriptionData): Promise<B
   });
 
   // Generate Google Maps QR Code for clinic location
-  const clinicQuery = `${branding.name}, ${branding.address || 'Gobichettipalayam'}`;
+  const clinicQuery = `${branding.name}, ${branding.address || 'Chennai'}`;
   const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(clinicQuery)}`;
   let qrBuffer: Buffer | null = null;
   try {
@@ -219,7 +219,7 @@ export const generatePrescriptionPDF = async (data: PrescriptionData): Promise<B
 
     const docName = data.doctorName && data.doctorName !== 'Doctor' && data.doctorName !== 'N/A'
       ? cleanDoctorName(data.doctorName)
-      : 'Dr. N MOHAMED RAFI B D S';
+      : 'Dr. Arun';
 
     // Unified Info Card — strictly authentic clinical metadata (no dummy departments or fabricated values)
     const patientItems = [
@@ -500,7 +500,7 @@ export const generateReceiptPDF = (data: ReceiptData): Promise<Buffer> => {
 
     const docName = data.doctorName && data.doctorName !== 'Doctor' && data.doctorName !== 'N/A'
       ? cleanDoctorName(data.doctorName)
-      : 'Dr. N MOHAMED RAFI B D S';
+      : 'Dr. Arun';
 
     const receiptType = data.totalPaymentsCount && data.totalPaymentsCount > 1
       ? `Installment ${data.paymentNumber || 1} of ${data.totalPaymentsCount}`

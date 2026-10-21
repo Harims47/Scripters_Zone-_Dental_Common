@@ -39,7 +39,7 @@ const loadConfigFromFile = (): Partial<ClinicConfig> | null => {
   try {
     if (fs.existsSync(SETTINGS_FILE)) {
       const raw = fs.readFileSync(SETTINGS_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw.replace(/^\uFEFF/, ''));
       if (parsed && typeof parsed === 'object') {
         return parsed as Partial<ClinicConfig>;
       }
@@ -57,15 +57,15 @@ export const getCanonicalClinicConfig = (): ClinicConfig => {
 
   const diskConfig = loadConfigFromFile();
 
-  const name = diskConfig?.name?.trim() || process.env.CLINIC_NAME || 'Rafi Dental Clinic';
-  const city = diskConfig?.city?.trim() || process.env.CLINIC_CITY || 'Gobichettipalayam';
-  const pin = diskConfig?.pin?.trim() || process.env.CLINIC_PIN || '638452';
-  const phone = diskConfig?.phone?.trim() || process.env.CLINIC_PHONE || '094430 23648';
-  const email = diskConfig?.email?.trim() || process.env.CLINIC_EMAIL || 'clinic@rafidental.com';
+  const name = diskConfig?.name?.trim() || process.env.CLINIC_NAME || process.env.VITE_CLINIC_NAME || 'Standard Dental Clinic';
+  const city = diskConfig?.city?.trim() || process.env.CLINIC_CITY || process.env.VITE_CLINIC_CITY || 'Chennai';
+  const pin = diskConfig?.pin?.trim() || process.env.CLINIC_PIN || process.env.VITE_CLINIC_PIN || '600001';
+  const phone = diskConfig?.phone?.trim() || process.env.CLINIC_PHONE || process.env.VITE_CLINIC_PHONE || '+91 98765 43210';
+  const email = diskConfig?.email?.trim() || process.env.CLINIC_EMAIL || process.env.VITE_CLINIC_EMAIL || 'care@standarddental.in';
   const language = diskConfig?.language?.trim() || 'English';
 
   // Construct full address from parts if available
-  let address = diskConfig?.address?.trim() || process.env.CLINIC_ADDRESS || '37, Dr.Venkatraman St, Gobichettipalayam, Tamil Nadu 638452';
+  let address = diskConfig?.address?.trim() || process.env.CLINIC_ADDRESS || process.env.VITE_CLINIC_ADDRESS || '12 Medical Center Road, Chennai - 600001';
   if (diskConfig?.address) {
     let addr = diskConfig.address.trim();
     const lowerAddr = addr.toLowerCase();

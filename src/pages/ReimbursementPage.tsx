@@ -94,8 +94,8 @@ export function ReimbursementPage() {
     }
     return {
       name: activeBranding.name,
-      address: '37, Dr.Venkatraman St, Gobichettipalayam, Tamil Nadu 638452',
-      phone: '094430 23648'
+      address: activeBranding.address,
+      phone: activeBranding.phone
     };
   }, []);
 

@@ -20,7 +20,11 @@ export function SettingsPage() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
-        const parsed = JSON.parse(saved)
+        const parsed = JSON.parse(saved);
+      if (parsed && (parsed.name?.includes('Rafi') || parsed.address?.includes('Venkatraman'))) {
+        localStorage.removeItem(STORAGE_KEY);
+        return DEMO_CLINIC_PROFILE;
+      }
         return { ...DEMO_CLINIC_PROFILE, ...parsed }
       }
     } catch {
