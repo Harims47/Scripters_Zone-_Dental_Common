@@ -37,11 +37,16 @@ import { MedicineCategoriesTab } from '../components/inventory/MedicineCategorie
 
 type InventoryItem = Medicine
 
-export function InventoryPage() {
+interface InventoryPageProps {
+  defaultTab?: 'items' | 'orders' | 'suppliers' | 'categories';
+  defaultType?: 'all' | 'item' | 'material';
+}
+
+export function InventoryPage({ defaultTab, defaultType }: InventoryPageProps = {}) {
   const { currentUser } = useAuth()
   const { refreshClinicOperations } = useClinicContext()
   const [searchParams] = useSearchParams()
-  const initialTab = (searchParams.get('tab') as 'items' | 'orders' | 'suppliers' | 'categories') || 'items'
+  const initialTab = defaultTab || (searchParams.get('tab') as 'items' | 'orders' | 'suppliers' | 'categories') || (defaultType === 'material' ? 'orders' : 'items')
   const preselectedMedicineId = searchParams.get('createForMedicine') || undefined
 
   const [activeTab, setActiveTab] = useState<'items' | 'orders' | 'suppliers' | 'categories'>(initialTab)

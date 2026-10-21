@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom"
 import { 
   LayoutDashboard, Users, Calendar, Clock, 
   Package, Stethoscope, Settings, Receipt,
-  LogOut, Menu, BarChart3, FolderArchive, FileText
+  LogOut, Menu, BarChart3, FolderArchive, FileText, Boxes
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { t } from "../../lib/i18n"
@@ -74,8 +74,8 @@ export function Sidebar({ className, onNavigate, isCollapsed = false, onToggleCo
     if (invIdx !== -1) {
       currentNavItems.splice(invIdx + 1, 0, {
         title: "Material PO",
-        href: "/inventory?tab=orders&type=material",
-        icon: Package
+        href: "/material-po",
+        icon: Boxes
       });
     }
   }

@@ -67,6 +67,7 @@ function App() {
             <Route path="partial-payments" element={<PartialPaymentAlertsPage />} />
             <Route path="queue" element={<QueuePage />} />
             <Route path="inventory" element={<InventoryPage />} />
+              <Route path="material-po" element={<InventoryPage defaultTab="orders" defaultType="material" />} />
             <Route path="billing" element={<BillingPage />} />
             <Route path="reimbursement" element={<ReimbursementPage />} />
             <Route path="staff" element={<StaffPage />} />

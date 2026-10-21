@@ -29,6 +29,8 @@ interface CreatePOItemRow {
 
 interface PurchaseOrdersTabProps {
   initialMedicineId?: string;
+  initialType?: 'all' | 'item' | 'material';
+  lockType?: 'all' | 'item' | 'material';
   onGoodsReceived?: () => void;
 }
 
@@ -79,7 +81,7 @@ export const extractPOFilters = (po: PurchaseOrder, medicinesList: Medicine[] = 
   return { categoryId, form };
 };
 
-export function PurchaseOrdersTab({ initialMedicineId, onGoodsReceived }: PurchaseOrdersTabProps = {}) {
+export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, onGoodsReceived }: PurchaseOrdersTabProps = {}) {
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -128,8 +130,9 @@ export function PurchaseOrdersTab({ initialMedicineId, onGoodsReceived }: Purcha
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   // Create / Edit PO form state
-  const [poType, setPoType] = useState<'MEDICINE' | 'MATERIAL'>('MEDICINE');
-  const [poCategoryFilter, setPoCategoryFilter] = useState<'all' | 'item' | 'material'>('all');
+  const defaultFilter = lockType || initialType || 'all';
+  const [poType, setPoType] = useState<'MEDICINE' | 'MATERIAL'>(defaultFilter === 'material' ? 'MATERIAL' : 'MEDICINE');
+  const [poCategoryFilter, setPoCategoryFilter] = useState<'all' | 'item' | 'material'>(defaultFilter);
   const [poSupplierFilter, setPoSupplierFilter] = useState('all');
   const [poSupplierId, setPoSupplierId] = useState('');
   const [poOrderDate, setPoOrderDate] = useState(new Date().toISOString().split('T')[0]);
