@@ -114,8 +114,8 @@ export function getClinicBranding(): ClinicBranding {
     phone: import.meta.env.VITE_CLINIC_PHONE || '+91 98765 43210',
     email: import.meta.env.VITE_CLINIC_EMAIL || 'care@dentalclinic.com',
     address: import.meta.env.VITE_CLINIC_ADDRESS || '123 Healthcare Ave, Medical Enclave',
-    logoUrl: import.meta.env.VITE_CLINIC_LOGO_URL || '/scripters_zone_logo_zoomed.png',
-    iconUrl: import.meta.env.VITE_CLINIC_ICON_URL || '/dental-icon.png',
+    logoUrl: import.meta.env.VITE_CLINIC_LOGO_URL || '/standard_dental_clinic_logo.png',
+    iconUrl: import.meta.env.VITE_CLINIC_ICON_URL || '/standard_dental_clinic_icon.png',
   };
 }
 
