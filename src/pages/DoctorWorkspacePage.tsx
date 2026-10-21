@@ -577,7 +577,9 @@ export function DoctorWorkspacePage() {
     if (!treatmentPlan?.items || !visitId) return []
     return treatmentPlan.items.filter((item: any) => 
       item.completedVisitId === visitId ||
-      (item.sessions && item.sessions.some((s: any) => s.visitId === visitId))
+      (item.sessions && item.sessions.some((s: any) => s.visitId === visitId)) ||
+      item.status === 'Planned' ||
+      item.status === 'In Progress'
     )
   }, [treatmentPlan, visitId])
 
@@ -2511,6 +2513,7 @@ export function DoctorWorkspacePage() {
                   )}
 
                   {/* Downloadable PDF Documents */}
+                  {activeFeatures.auditReceiptIsolation && (
                   <div className="pt-2.5 mt-2 border-t border-slate-200/90 flex flex-col gap-1.5">
                     {activeFeatures.auditReceiptIsolation && auditAmount && parseFloat(auditAmount) > 0 ? (
                       <Button
@@ -2548,6 +2551,7 @@ export function DoctorWorkspacePage() {
                       Download Tax Invoice
                     </Button>
                   </div>
+                  )}
                 </div>
               )}
             </div>
