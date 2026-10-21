@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { activeBranding } from './config/features';
 import { AppShell } from './components/layout/app-shell';
 import { PatientsPage } from './pages/Patients';
 import { SettingsPage } from './pages/SettingsPage';
@@ -36,6 +38,14 @@ const RoleBasedRedirect = () => {
 };
 
 function App() {
+  useEffect(() => {
+    document.title = `${activeBranding.name} - DentalCore`;
+    const favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+    if (favicon && activeBranding.iconUrl) {
+      favicon.href = activeBranding.iconUrl;
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <ClinicProvider>

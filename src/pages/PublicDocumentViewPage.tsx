@@ -1,3 +1,4 @@
+import { activeBranding } from '../config/features';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FileText, Download, Printer, ShieldCheck, Phone, MapPin } from 'lucide-react';
@@ -62,7 +63,7 @@ export function PublicDocumentViewPage() {
             This link is incomplete or has expired. Please contact the clinic for an updated document link.
           </p>
           <div className="p-4 bg-slate-50 rounded-xl text-xs text-slate-500 space-y-1 text-left">
-            <p className="font-semibold text-slate-700">Rafi Dental Clinic</p>
+            <p className="font-semibold text-slate-700">{activeBranding.name}</p>
             <p>📞 094430 23648</p>
             <p>📍 37, Dr.Venkatraman St, Gobichettipalayam</p>
           </div>
@@ -83,7 +84,7 @@ export function PublicDocumentViewPage() {
               </svg>
             </div>
             <div>
-              <h1 className="text-base font-bold text-slate-900 leading-tight">Rafi Dental Clinic</h1>
+              <h1 className="text-base font-bold text-slate-900 leading-tight">{activeBranding.name}</h1>
               <div className="flex items-center gap-2 text-xs text-slate-500">
                 <span className="flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Official Document

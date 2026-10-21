@@ -1,3 +1,4 @@
+import { activeBranding } from '../config/features';
 import { useState, useEffect, useMemo } from 'react';
 import { useClinicContext } from '../context/ClinicContext';
 import { api, API_BASE_URL } from '../lib/api';
@@ -92,7 +93,7 @@ export function ReimbursementPage() {
       // Fallback
     }
     return {
-      name: 'Rafi Dental Clinic',
+      name: activeBranding.name,
       address: '37, Dr.Venkatraman St, Gobichettipalayam, Tamil Nadu 638452',
       phone: '094430 23648'
     };

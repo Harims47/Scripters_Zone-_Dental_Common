@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { activeBranding } from '../config/features'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -53,8 +54,8 @@ export function LoginPage() {
           {/* Top: Broad Logo - Exactly -55px left shift */}
           <div className="w-72 sm:w-80 md:w-[350px] max-w-full transition-transform hover:scale-[1.01] duration-300" style={{ marginLeft: '-55px' }}>
             <img
-              src="/dental-logo.png"
-              alt="Rafi Dental Clinic"
+              src={activeBranding.logoUrl}
+              alt={activeBranding.name}
               className="w-full h-auto object-contain drop-shadow-sm"
             />
           </div>
@@ -122,8 +123,8 @@ export function LoginPage() {
             {/* Mobile/Tablet Clinic Logo */}
             <div className="lg:hidden flex justify-center mb-2 sm:mb-3">
               <img
-                src="/dental-logo.png"
-                alt="Rafi Dental Clinic"
+                src={activeBranding.logoUrl}
+                alt={activeBranding.name}
                 className="h-8 sm:h-11 w-auto object-contain drop-shadow-xs"
               />
             </div>
@@ -134,7 +135,7 @@ export function LoginPage() {
                 Welcome Back
               </h1>
               <p className="text-[11px] sm:text-sm text-slate-500 font-medium">
-                Sign in to your Rafi Dental Clinic account
+                Sign in to your {activeBranding.name} account
               </p>
             </div>
 
