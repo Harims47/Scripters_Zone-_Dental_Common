@@ -23,6 +23,7 @@ export function ProcurementReport({ dateRange, defaultType }: ProcurementReportP
   const [error, setError] = useState<string | null>(null)
 
   const [activeTab, setActiveTab] = useState<'orders' | 'bills' | 'payments'>('orders')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'material' | 'medicine'>('all')
   const [supplierFilter, setSupplierFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
@@ -42,6 +43,7 @@ export function ProcurementReport({ dateRange, defaultType }: ProcurementReportP
       const params = new URLSearchParams()
       params.set('page', String(pagination.pageIndex + 1))
       params.set('limit', String(pagination.pageSize))
+      if (typeFilter !== 'all') params.set('type', typeFilter)
       if (supplierFilter !== 'all') params.set('supplierId', supplierFilter)
       if (statusFilter !== 'all') params.set('status', statusFilter)
       if (dateRange.startDate) params.set('startDate', dateRange.startDate)
@@ -56,7 +58,7 @@ export function ProcurementReport({ dateRange, defaultType }: ProcurementReportP
     } finally {
       setLoading(false)
     }
-  }, [dateRange.startDate, dateRange.endDate, pagination.pageIndex, pagination.pageSize, supplierFilter, statusFilter])
+  }, [dateRange.startDate, dateRange.endDate, pagination.pageIndex, pagination.pageSize, supplierFilter, statusFilter, typeFilter])
 
   useEffect(() => {
     fetchData()
@@ -64,13 +66,14 @@ export function ProcurementReport({ dateRange, defaultType }: ProcurementReportP
 
   useEffect(() => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }))
-  }, [supplierFilter, statusFilter, dateRange.startDate, dateRange.endDate, activeTab])
+  }, [supplierFilter, statusFilter, typeFilter, dateRange.startDate, dateRange.endDate, activeTab])
 
   const handleExport = async (format: 'pdf' | 'xlsx' | 'csv') => {
     try {
       const params = new URLSearchParams()
       params.set('format', format)
       params.set('section', activeTab)
+      if (typeFilter !== 'all') params.set('type', typeFilter)
       if (supplierFilter !== 'all') params.set('supplierId', supplierFilter)
       if (statusFilter !== 'all') params.set('status', statusFilter)
       if (dateRange.startDate) params.set('startDate', dateRange.startDate)
@@ -104,7 +107,21 @@ export function ProcurementReport({ dateRange, defaultType }: ProcurementReportP
     {
       header: () => <div className="text-left font-semibold text-slate-600">PO Number</div>,
       accessorKey: 'orderNumber',
-      cell: ({ row }) => <span className="font-mono text-xs font-semibold text-slate-900">{row.original.orderNumber}</span>
+      cell: ({ row }) => {
+        const isMaterial = row.original.poType === 'MATERIAL'
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-semibold text-slate-900">{row.original.orderNumber}</span>
+            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md border leading-none ${
+              isMaterial 
+                ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                : 'bg-indigo-50 text-indigo-700 border-indigo-200'
+            }`}>
+              {isMaterial ? 'Material' : 'Medicine'}
+            </span>
+          </div>
+        )
+      }
     },
     {
       header: () => <div className="text-left font-semibold text-slate-600">Supplier</div>,
@@ -398,6 +415,19 @@ export function ProcurementReport({ dateRange, defaultType }: ProcurementReportP
           }}
           filterSlot={
             <div className="flex flex-wrap items-center gap-2">
+              {activeTab === 'orders' && (
+                <Select value={typeFilter} onValueChange={(val: any) => setTypeFilter(val)}>
+                  <SelectTrigger className="h-9 w-[170px] bg-slate-50/50 border-slate-200 text-xs font-medium">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="material">📦 Dental Material</SelectItem>
+                    <SelectItem value="medicine">💊 Medicine / Items</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+
               <Select value={supplierFilter} onValueChange={setSupplierFilter}>
                 <SelectTrigger className="h-9 w-[160px] bg-slate-50/50 border-slate-200 text-xs font-medium">
                   <SelectValue placeholder="All Suppliers" />

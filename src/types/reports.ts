@@ -224,6 +224,7 @@ export interface ProcurementReportItem {
   receivedQuantity: number;
   totalCostValue: number;
   status: string;
+  poType?: 'MATERIAL' | 'MEDICINE';
 }
 
 export interface SupplierProcurementSummary {

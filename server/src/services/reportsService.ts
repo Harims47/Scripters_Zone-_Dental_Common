@@ -1325,6 +1325,7 @@ export interface ProcurementFilterParams {
   endDate?: string;
   supplierId?: string;
   status?: string;
+  type?: string;
   page?: number;
   limit?: number;
 }
@@ -1337,6 +1338,44 @@ export function buildProcurementWhereClause(params: ProcurementFilterParams) {
   if (dateFilter) where.orderDate = dateFilter;
   if (params.supplierId && params.supplierId !== 'all') where.supplierId = params.supplierId;
   if (params.status && params.status !== 'all') where.status = params.status;
+
+  if (params.type === 'material') {
+    where.OR = [
+      { notes: { contains: '[Material PO]' } },
+      {
+        items: {
+          some: {
+            OR: [
+              { medicine: { form: { in: ['Material', 'Dental Material', 'Consumable', 'Instrument / Tool', 'Disposable', 'Equipment', 'Other Material'] } } },
+              { medicine: { category: { name: { in: ['Dental Materials', 'Consumables', 'Instruments', 'Dental Supplies', 'Equipment'] } } } }
+            ]
+          }
+        }
+      }
+    ];
+  } else if (params.type === 'medicine') {
+    where.AND = [
+      {
+        OR: [
+          { notes: null },
+          { NOT: { notes: { contains: '[Material PO]' } } }
+        ]
+      },
+      {
+        NOT: {
+          items: {
+            some: {
+              OR: [
+                { medicine: { form: { in: ['Material', 'Dental Material', 'Consumable', 'Instrument / Tool', 'Disposable', 'Equipment', 'Other Material'] } } },
+                { medicine: { category: { name: { in: ['Dental Materials', 'Consumables', 'Instruments', 'Dental Supplies', 'Equipment'] } } } }
+              ]
+            }
+          }
+        }
+      }
+    ];
+  }
+
   return where;
 }
 
