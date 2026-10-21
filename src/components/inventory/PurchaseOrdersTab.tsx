@@ -32,6 +32,7 @@ interface PurchaseOrdersTabProps {
   initialType?: 'all' | 'item' | 'material';
   lockType?: 'all' | 'item' | 'material';
   onGoodsReceived?: () => void;
+  onOrdersUpdated?: () => void;
 }
 
 const MATERIAL_FORMS = ['Material', 'Dental Material', 'Consumable', 'Instrument / Tool', 'Disposable', 'Equipment', 'Other Material'];
@@ -81,7 +82,7 @@ export const extractPOFilters = (po: PurchaseOrder, medicinesList: Medicine[] = 
   return { categoryId, form };
 };
 
-export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, onGoodsReceived }: PurchaseOrdersTabProps = {}) {
+export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, onGoodsReceived, onOrdersUpdated }: PurchaseOrdersTabProps = {}) {
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -453,7 +454,9 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
       }
 
       setDrawerOpen(false);
-      fetchOrders();
+      await fetchOrders();
+      onOrdersUpdated?.();
+      onGoodsReceived?.();
     } catch (err: any) {
       toast.error(err.message || err.response?.data?.error || 'Failed to save purchase order');
     } finally {
@@ -474,7 +477,9 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
           : `PO ${po.orderNumber} has been cancelled`
       );
       setConfirmStatusAction(null);
-      fetchOrders();
+      await fetchOrders();
+      onOrdersUpdated?.();
+      onGoodsReceived?.();
     } catch (err: any) {
       toast.error(err.response?.data?.error || `Failed to transition PO to ${targetStatus}`);
     } finally {
@@ -1420,6 +1425,8 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
         bill={paymentTargetBill}
         onSuccess={() => {
           fetchOrders();
+          onOrdersUpdated?.();
+          onGoodsReceived?.();
           if (selectedOrder) {
             api.get<PurchaseOrder>(`/api/purchase-orders/${selectedOrder.id}`).then((po) => {
               setSelectedOrder(po);
@@ -1581,7 +1588,9 @@ export function PurchaseOrdersTab({ initialMedicineId, initialType, lockType, on
                 }
 
                 setBillPaymentPO(null);
-                fetchOrders();
+                await fetchOrders();
+                onOrdersUpdated?.();
+                onGoodsReceived?.();
                 if (selectedOrder && selectedOrder.id === billPaymentPO.id) {
                   const refreshed = await api.get<PurchaseOrder>(`/api/purchase-orders/${selectedOrder.id}`);
                   setSelectedOrder(refreshed);

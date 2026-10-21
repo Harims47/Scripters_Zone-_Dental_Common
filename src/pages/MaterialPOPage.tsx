@@ -26,11 +26,16 @@ export function MaterialPOPage() {
         });
 
         const total = matOrders.length;
-        const ordered = matOrders.filter(po => po.status === 'Ordered').length;
+        const ordered = matOrders.filter(po => po.status === 'Ordered' || po.status === 'Partially Received').length;
         const received = matOrders.filter(po => po.status === 'Received').length;
         const totalSpend = matOrders
           .filter(po => po.status !== 'Cancelled')
-          .reduce((sum, po) => sum + (Number(po.totalAmount) || 0), 0);
+          .reduce((sum, po) => {
+            const itemsCost = (po.items || []).reduce((itemSum: number, item: any) => {
+              return itemSum + (Number(item.orderedQuantity || 0) * Number(item.unitCost || 0));
+            }, 0);
+            return sum + (itemsCost || Number(po.totalAmount) || 0);
+          }, 0);
 
         setStats({ total, ordered, received, totalSpend });
       })
@@ -106,7 +111,7 @@ export function MaterialPOPage() {
 
         {/* Dedicated Purchase Orders Tab locked strictly to MATERIAL */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 sm:p-6">
-          <PurchaseOrdersTab lockType="material" onGoodsReceived={refreshStats} />
+          <PurchaseOrdersTab lockType="material" onGoodsReceived={refreshStats} onOrdersUpdated={refreshStats} />
         </div>
       </div>
     </div>
