@@ -791,13 +791,14 @@ export function DoctorWorkspacePage() {
         setIsConsultationZeroFeeModalOpen(true);
         return;
       }
+      const effectiveTreatmentFee = treatmentFee > 0 ? treatmentFee : (visit?.treatmentFee || 0);
       const res = await saveConsultation(visitId, {
         reasonForVisit: reason,
         clinicalNotes: notes.trim(),
         consultationFee,
-        treatmentFee: treatmentFee as any,
+        treatmentFee: effectiveTreatmentFee,
         consultationWaiverReason: consultationFee === 0 ? consultationZeroReason.trim() : null,
-        treatmentWaiverReason: treatmentFee === 0 ? treatmentZeroReason.trim() : null
+        treatmentWaiverReason: effectiveTreatmentFee === 0 ? treatmentZeroReason.trim() : null
       });
       if (res && !res.success) {
         alert(res.error || 'Failed to save consultation');
