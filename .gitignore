@@ -41,3 +41,5 @@ server/uploads/
 
 # GoDaddy Airo managed config
 .airo/
+
+cloudflared.exe
