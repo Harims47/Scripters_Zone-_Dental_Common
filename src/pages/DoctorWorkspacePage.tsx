@@ -577,9 +577,7 @@ export function DoctorWorkspacePage() {
     if (!treatmentPlan?.items || !visitId) return []
     return treatmentPlan.items.filter((item: any) => 
       item.completedVisitId === visitId ||
-      (item.sessions && item.sessions.some((s: any) => s.visitId === visitId)) ||
-      item.status === 'Planned' ||
-      item.status === 'In Progress'
+      (item.sessions && item.sessions.some((s: any) => s.visitId === visitId))
     )
   }, [treatmentPlan, visitId])
 
@@ -1675,10 +1673,7 @@ export function DoctorWorkspacePage() {
                   }
 
                   // Procedure Check: Adding a procedure is mandatory unless clinical reason provided
-                  const currentProcs = (treatmentPlan?.items || []).filter(
-                    (item: any) => item.completedVisitId === visitId || item.status === 'Planned'
-                  );
-                  const hasProcedures = currentProcs.length > 0;
+                  const hasProcedures = currentVisitTreatments.length > 0;
                   const hasProcReason = Boolean(
                     treatmentZeroReason?.trim() ||
                     (consultation as any)?.treatmentWaiverReason?.trim() ||
