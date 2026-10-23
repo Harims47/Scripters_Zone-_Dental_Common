@@ -575,11 +575,13 @@ export function DoctorWorkspacePage() {
   // or had treatment sessions (sittings) conducted in this visit
   const currentVisitTreatments = useMemo(() => {
     if (!treatmentPlan?.items || !visitId) return []
+    const visitTime = visit?.createdAt ? new Date(visit.createdAt).getTime() - 1000 : 0
     return treatmentPlan.items.filter((item: any) => 
       item.completedVisitId === visitId ||
-      (item.sessions && item.sessions.some((s: any) => s.visitId === visitId))
+      (item.sessions && item.sessions.some((s: any) => s.visitId === visitId)) ||
+      (visitTime > 0 && item.createdAt && new Date(item.createdAt).getTime() >= visitTime)
     )
-  }, [treatmentPlan, visitId])
+  }, [treatmentPlan, visitId, visit?.createdAt])
 
   const hasTreatmentRecordForVisit = useMemo(() => {
     return (
